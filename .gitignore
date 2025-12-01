@@ -11,6 +11,8 @@ wp-content/plugins/
 wp-content/themes/twentytwentythree/
 wp-content/themes/twentytwentyfour/
 wp-content/themes/twentytwentyfive/
+wp-content/ai1wm-backups/
+wp-content/siteguard/
 
 # uploadsの一部をテンプレートファイルとして使用しているため
 # uploads 全体を無視
