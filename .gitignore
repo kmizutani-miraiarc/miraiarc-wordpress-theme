@@ -1,0 +1,45 @@
+# WordPress
+.env
+wp-content/upgrade/
+wp-content/backup-db/
+wp-content/advanced-cache.php
+wp-content/wp-cache-config.php
+wp-content/cache/
+wp-content/cache/supercache/
+wp-content/languages/
+wp-content/plugins/
+wp-content/themes/twentytwentythree/
+wp-content/themes/twentytwentyfour/
+wp-content/themes/twentytwentyfive/
+
+# uploadsの一部をテンプレートファイルとして使用しているため
+# uploads 全体を無視
+wp-content/uploads/**
+
+# 親ディレクトリをまず復活させる
+!wp-content/uploads/
+
+# 使いたいフォルダを復活
+!wp-content/uploads/template/
+!wp-content/uploads/custom-css/
+!wp-content/uploads/wpcf7_contact_forms/
+
+# その中のファイルもすべて復活
+!wp-content/uploads/template/**
+!wp-content/uploads/custom-css/**
+!wp-content/uploads/wpcf7_contact_forms/**
+
+# ログファイル
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
