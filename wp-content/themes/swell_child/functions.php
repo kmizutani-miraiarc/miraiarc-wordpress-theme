@@ -241,7 +241,7 @@ add_shortcode('purchase_achievements_list', function($atts) {
     foreach ($achievements as $achievement) {
       $achievement_id = intval($achievement['id'] ?? 0);
       $title = $achievement['title'] ?? $achievement['property_name'] ?? 'タイトルなし';
-      $image_url = $achievement['image_url'] ?? '';
+      $image_url = esc_url($achievement['property_image_url'] ?? '');
       
       // 詳細ページへのリンク
       $detail_url = add_query_arg('id', $achievement_id, home_url('/purchase-achievements-detail/'));
