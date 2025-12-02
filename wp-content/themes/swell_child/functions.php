@@ -180,3 +180,19 @@ add_filter('swell_breadcrumb_list_data', function($list_data) {
   
   return $list_data;
 }, 999, 1);
+
+// 買取実績詳細ページ（固定ページ）にsingleクラスを追加して、single-example.phpと同じCSSを適用
+add_filter('body_class', function($classes) {
+  if ( is_page() ) {
+    global $post;
+    $page_slug = $post->post_name;
+    
+    if ( $page_slug === 'purchase-achievements-detail' ) {
+      // singleクラスを追加して、single-example.phpと同じCSSを適用
+      $classes[] = 'single';
+      $classes[] = 'single-example';
+    }
+  }
+  
+  return $classes;
+}, 10, 1);

@@ -83,46 +83,24 @@ if ($achievement_id > 0) {
 
         <!-- 基本情報テーブル -->
         <?php
-        $rows = [];
-        
-        if (!empty($achievement['property_name'])) {
-            $rows[] = ['label' => '物件名', 'value' => $achievement['property_name']];
-        }
-        
-        if (!empty($achievement['building_age'])) {
-            $rows[] = ['label' => '築年数', 'value' => $achievement['building_age'] . '年'];
-        }
-        
-        if (!empty($achievement['structure'])) {
-            $rows[] = ['label' => '構造', 'value' => $achievement['structure']];
-        }
-        
-        if (!empty($achievement['nearest_station'])) {
-            $rows[] = ['label' => '最寄駅', 'value' => $achievement['nearest_station']];
-        }
-        
-        if (!empty($achievement['prefecture']) || !empty($achievement['city'])) {
-            $address = trim(($achievement['prefecture'] ?? '') . ($achievement['city'] ?? '') . ($achievement['address_detail'] ?? ''));
-            if ($address) {
-                $rows[] = ['label' => '所在地', 'value' => $address];
-            }
-        }
-        
-        if (!empty($achievement['purchase_date'])) {
-            $rows[] = ['label' => '買取日', 'value' => $achievement['purchase_date']];
-        }
+        // 指定された項目を常に表示（データがない場合もタイトルだけ表示）
+        $rows = [
+            ['label' => '物件名', 'value' => $achievement['property_name'] ?? ''],
+            ['label' => '築年数', 'value' => !empty($achievement['building_age']) ? $achievement['building_age'] . '年' : ''],
+            ['label' => '構造', 'value' => $achievement['structure'] ?? ''],
+            ['label' => '最寄り', 'value' => $achievement['nearest_station'] ?? ''],
+            ['label' => '買取日', 'value' => $achievement['purchase_date'] ?? ''],
+        ];
         ?>
 
-        <?php if ( !empty($rows) ) : ?>
-          <section class="c-section" aria-label="物件情報">
-            <dl class="c-table" style="display:grid;grid-template-columns:70px 1fr;gap:12px 20px;">
-              <?php foreach ( $rows as $r ) : ?>
-                <dt style="font-weight:700;"><?php echo esc_html( $r['label'] ); ?></dt>
-                <dd><?php echo wp_kses_post( nl2br( esc_html($r['value']) ) ); ?></dd>
-              <?php endforeach; ?>
-            </dl>
-          </section>
-        <?php endif; ?>
+        <section class="c-section" aria-label="物件情報">
+          <dl class="c-table" style="display:grid;grid-template-columns:70px 1fr;gap:12px 20px;">
+            <?php foreach ( $rows as $r ) : ?>
+              <dt style="font-weight:700;"><?php echo esc_html( $r['label'] ); ?></dt>
+              <dd><?php echo !empty($r['value']) ? wp_kses_post( nl2br( esc_html($r['value']) ) ) : ''; ?></dd>
+            <?php endforeach; ?>
+          </dl>
+        </section>
 
         <!-- 本文（必要なら事例ストーリーや補足をエディタで） -->
         <?php if ( !empty($achievement['description']) || !empty($achievement['comment']) ) : ?>

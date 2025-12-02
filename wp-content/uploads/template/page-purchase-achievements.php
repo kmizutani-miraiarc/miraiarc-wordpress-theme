@@ -162,12 +162,19 @@ $noimg = get_stylesheet_directory_uri() . '/assets/img/noimg.png';
             </a>
 
             <div class="ex-card__body">
-              <!-- カテゴリ（都道府県） -->
-              <div class="ex-card__cats">
-                <?php if ( $prefecture ) : ?>
-                  <a href="<?php echo esc_url(add_query_arg('prefecture', $prefecture, home_url('/purchase-achievements/'))); ?>"><?php echo $prefecture; ?></a>
-                <?php else : ?>
-                  物件カテゴリ
+              <!-- カテゴリ（都道府県）と買取日 -->
+              <div class="ex-card__cats" style="display:flex;justify-content:space-between;align-items:center;">
+                <span>
+                  <?php if ( $prefecture ) : ?>
+                    <a href="<?php echo esc_url(add_query_arg('prefecture', $prefecture, home_url('/purchase-achievements/'))); ?>"><?php echo $prefecture; ?></a>
+                  <?php else : ?>
+                    物件カテゴリ
+                  <?php endif; ?>
+                </span>
+                <?php if ( !empty($achievement['purchase_date']) ) : ?>
+                  <span style="text-align:right;font-size:.86rem;color:#6b7280;">
+                    <?php echo esc_html($achievement['purchase_date']); ?>
+                  </span>
                 <?php endif; ?>
               </div>
 
@@ -175,7 +182,7 @@ $noimg = get_stylesheet_directory_uri() . '/assets/img/noimg.png';
               <h2 class="ex-card__title"><a href="<?php echo $detail_url; ?>"><?php echo $title ?: $property_name; ?></a></h2>
 
               <!-- 説明 -->
-              <div class="ex-card__excerpt">
+              <div class="ex-card__excerpt" style="display:none;">
                 <?php echo wp_trim_words( $summary, 36, '…' ); ?>
               </div>
             </div>
