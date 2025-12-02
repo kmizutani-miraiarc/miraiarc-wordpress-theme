@@ -15,6 +15,13 @@ get_header();
 #main_visual {
   display: none !important;
 }
+/* single-example.phpと同じl-contentの幅にする */
+/* single-example.phpは約821px、page-purchase-achievements-detail.phpは約875pxの差があるため調整 */
+.page.single.single-example .ex-single .l-content {
+  max-width: 846px;
+  width: 100%;
+  box-sizing: border-box;
+}
 </style>
 <?php
 
@@ -53,6 +60,46 @@ if ($achievement_id > 0) {
         if ($data && isset($data['status']) && $data['status'] === 'success' && isset($data['data'])) {
             $achievement = $data['data'];
             $achievement_title = $achievement['title'] ?? $achievement['property_name'] ?? '詳細';
+        }
+    }
+}
+
+// 最新事例を取得（現在表示中のIDを除外）
+$recent_achievements = [];
+if ($api_url && $api_key) {
+    $recent_api_endpoint = rtrim($api_url, '/') . '/purchase-achievements';
+    $recent_api_params = [
+        'is_public' => 'true',
+        'limit' => 5,
+        'offset' => 0,
+    ];
+    // 現在表示中のIDを除外する場合は、APIが対応していれば除外パラメータを追加
+    // ここでは取得後に除外する方法を使用
+    
+    $recent_api_url_with_params = $recent_api_endpoint . '?' . http_build_query($recent_api_params);
+    
+    $recent_response = wp_remote_get($recent_api_url_with_params, [
+        'headers' => [
+            'X-API-Key' => $api_key,
+            'Content-Type' => 'application/json',
+        ],
+        'timeout' => 30,
+    ]);
+    
+    if (!is_wp_error($recent_response)) {
+        $recent_body = wp_remote_retrieve_body($recent_response);
+        $recent_data = json_decode($recent_body, true);
+        
+        if ($recent_data && isset($recent_data['status']) && $recent_data['status'] === 'success' && isset($recent_data['data'])) {
+            $recent_achievements = $recent_data['data'] ?? [];
+            // 現在表示中のIDを除外
+            if ($achievement_id > 0) {
+                $recent_achievements = array_filter($recent_achievements, function($item) use ($achievement_id) {
+                    return isset($item['id']) && intval($item['id']) !== $achievement_id;
+                });
+                // 最大5件に制限
+                $recent_achievements = array_slice($recent_achievements, 0, 5);
+            }
         }
     }
 }
@@ -154,6 +201,23 @@ if ($achievement_id > 0) {
         <li><a href="<?php echo esc_url(add_query_arg('prefecture', '群馬県', home_url('/purchase-achievements/'))); ?>">群馬県</a></li>
         <li><a href="<?php echo esc_url(add_query_arg('prefecture', '茨城県', home_url('/purchase-achievements/'))); ?>">茨城県</a></li>
         <li><a href="<?php echo esc_url(add_query_arg('prefecture', '東京都', home_url('/purchase-achievements/'))); ?>">都内エリア</a></li>
+      </ul>
+    </div>
+
+    <!-- 最新事例 -->
+    <div class="widget">
+      <h2 class="widget__title">最新事例</h2>
+      <ul>
+        <?php if ( !empty($recent_achievements) ) : ?>
+          <?php foreach ( $recent_achievements as $recent_item ) : 
+            $recent_title = $recent_item['title'] ?? $recent_item['property_name'] ?? '';
+            $recent_detail_url = add_query_arg('id', intval($recent_item['id']), home_url('/purchase-achievements-detail/'));
+          ?>
+            <li><a href="<?php echo esc_url($recent_detail_url); ?>"><?php echo esc_html($recent_title); ?></a></li>
+          <?php endforeach; ?>
+        <?php else : ?>
+          <li>まだ投稿がありません</li>
+        <?php endif; ?>
       </ul>
     </div>
   </aside>
