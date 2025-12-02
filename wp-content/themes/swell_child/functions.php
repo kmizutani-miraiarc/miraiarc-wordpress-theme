@@ -86,3 +86,97 @@ add_action('pre_get_posts', function( $query ) {
     $query->set('posts_per_page', 6);
   }
 });
+
+// 固定ページ用の買取実績テンプレートルーティング
+add_filter( 'template_include', function( $template ) {
+  // 固定ページの買取実績テンプレート
+  if ( is_page() ) {
+    global $post;
+    $page_slug = $post->post_name;
+    
+    // 買取実績一覧ページ（固定ページのスラッグが 'purchase-achievements' の場合）
+    if ( $page_slug === 'purchase-achievements' ) {
+      // URLパラメーターで都道府県が指定されている場合は都道府県別テンプレート
+      if ( isset($_GET['prefecture']) && !empty($_GET['prefecture']) ) {
+        $prefecture_template = WP_CONTENT_DIR . '/uploads/template/page-purchase-achievements-prefecture.php';
+        if ( file_exists( $prefecture_template ) ) {
+          return $prefecture_template;
+        }
+      }
+      // 通常の一覧テンプレート
+      $archive_template = WP_CONTENT_DIR . '/uploads/template/page-purchase-achievements.php';
+      if ( file_exists( $archive_template ) ) {
+        return $archive_template;
+      }
+    }
+    
+    // 買取実績詳細ページ（固定ページのスラッグが 'purchase-achievements-detail' の場合）
+    if ( $page_slug === 'purchase-achievements-detail' ) {
+      $detail_template = WP_CONTENT_DIR . '/uploads/template/page-purchase-achievements-detail.php';
+      if ( file_exists( $detail_template ) ) {
+        return $detail_template;
+      }
+    }
+  }
+  
+  return $template;
+}, 100 );
+
+// 買取実績詳細ページのパンくずリストをカスタマイズ
+// 固定ページとして認識されるが、URLパラメーターからタイトルを取得してパンくずを動的に生成
+add_filter('swell_breadcrumb_list_data', function($list_data) {
+  // 買取実績詳細ページ（固定ページ）かどうかを判定
+  if ( is_page() ) {
+    global $post;
+    $page_slug = $post->post_name;
+    
+    if ( $page_slug === 'purchase-achievements-detail' ) {
+      // URLパラメーターからIDを取得
+      $achievement_id = 0;
+      if ( isset($_GET['id']) && !empty($_GET['id']) ) {
+        $achievement_id = intval($_GET['id']);
+      }
+      
+      if ( $achievement_id > 0 ) {
+        // APIからタイトルを取得
+        $api_url = getenv('MIRAI_API_URL') ?: 'http://localhost:8000';
+        $api_key = getenv('MIRAI_API_KEY') ?: '';
+        $api_endpoint = rtrim($api_url, '/') . '/purchase-achievements/' . $achievement_id;
+        
+        $response = wp_remote_get($api_endpoint, [
+          'headers' => [
+            'X-API-Key' => $api_key,
+            'Content-Type' => 'application/json',
+          ],
+          'timeout' => 10,
+        ]);
+        
+        $achievement_title = '詳細';
+        if (!is_wp_error($response)) {
+          $body = wp_remote_retrieve_body($response);
+          $data = json_decode($body, true);
+          
+          if ($data && isset($data['status']) && $data['status'] === 'success' && isset($data['data'])) {
+            $achievement = $data['data'];
+            $achievement_title = $achievement['title'] ?? $achievement['property_name'] ?? '詳細';
+          }
+        }
+        
+        // パンくずリストを置き換え
+        // 固定ページのタイトルをAPIから取得したタイトルに置き換える
+        $list_data = [
+          [
+            'url'  => home_url('/purchase-achievements/'),
+            'name' => '買取実績',
+          ],
+          [
+            'url'  => '',
+            'name' => $achievement_title,
+          ],
+        ];
+      }
+    }
+  }
+  
+  return $list_data;
+}, 999, 1);
