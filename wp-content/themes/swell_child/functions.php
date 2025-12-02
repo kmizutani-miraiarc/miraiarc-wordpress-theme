@@ -196,3 +196,85 @@ add_filter('body_class', function($classes) {
   
   return $classes;
 }, 10, 1);
+
+// 買取実績一覧ショートコード（公開フラグON、新しい順3件）
+add_shortcode('purchase_achievements_list', function($atts) {
+  // 環境変数からAPI設定を取得
+  $api_url = getenv('MIRAI_API_URL') ?: 'http://localhost:8000';
+  $api_key = getenv('MIRAI_API_KEY') ?: '';
+  
+  // APIから買取実績一覧を取得（公開フラグON、新しい順、3件）
+  $api_endpoint = rtrim($api_url, '/') . '/purchase-achievements';
+  $api_params = [
+    'is_public' => 'true',
+    'limit' => 3,
+    'offset' => 0,
+  ];
+  
+  $api_url_with_params = $api_endpoint . '?' . http_build_query($api_params);
+  
+  $response = wp_remote_get($api_url_with_params, [
+    'headers' => [
+      'X-API-Key' => $api_key,
+      'Content-Type' => 'application/json',
+    ],
+    'timeout' => 30,
+  ]);
+  
+  $achievements = [];
+  
+  if (!is_wp_error($response)) {
+    $body = wp_remote_retrieve_body($response);
+    $data = json_decode($body, true);
+    
+    if ($data && isset($data['status']) && $data['status'] === 'success') {
+      $achievements = $data['data'] ?? [];
+    }
+  }
+  
+  // HTML生成
+  $output = '<div class="p-postListWrap"><ul class="p-postList -type-card -pc-col3 -sp-col1">';
+  
+  if (empty($achievements)) {
+    $output .= '<li class="p-postList__item">買取実績がありません</li>';
+  } else {
+    foreach ($achievements as $achievement) {
+      $achievement_id = intval($achievement['id'] ?? 0);
+      $title = $achievement['title'] ?? $achievement['property_name'] ?? 'タイトルなし';
+      $image_url = $achievement['image_url'] ?? '';
+      
+      // 詳細ページへのリンク
+      $detail_url = add_query_arg('id', $achievement_id, home_url('/purchase-achievements-detail/'));
+      
+      // 画像がない場合はnoimg_クラスを追加
+      $noimg_class = empty($image_url) ? ' noimg_' : '';
+      $noimg_url = get_template_directory_uri() . '/assets/img/no_img.png';
+      
+      $output .= '<li class="p-postList__item">';
+      $output .= '<a href="' . esc_url($detail_url) . '" class="p-postList__link">';
+      $output .= '<div class="p-postList__thumb c-postThumb' . esc_attr($noimg_class) . '">';
+      $output .= '<figure class="c-postThumb__figure">';
+      
+      if (!empty($image_url)) {
+        $output .= '<img decoding="async" src="' . esc_url($image_url) . '" data-src="' . esc_url($image_url) . '" alt="' . esc_attr($title) . '" class="c-postThumb__img u-obf-cover lazyloaded">';
+        $output .= '<noscript><img decoding="async" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="' . esc_url($image_url) . '" alt="' . esc_attr($title) . '" class="c-postThumb__img u-obf-cover lazyload"><noscript><img decoding="async" src="' . esc_url($image_url) . '" alt="' . esc_attr($title) . '" class="c-postThumb__img u-obf-cover"></noscript></noscript>';
+      } else {
+        $output .= '<img decoding="async" src="' . esc_url($noimg_url) . '" data-src="' . esc_url($noimg_url) . '" alt="" class="c-postThumb__img u-obf-cover lazyloaded">';
+        $output .= '<noscript><img decoding="async" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="' . esc_url($noimg_url) . '" alt="" class="c-postThumb__img u-obf-cover lazyload"><noscript><img decoding="async" src="' . esc_url($noimg_url) . '" alt="" class="c-postThumb__img u-obf-cover"></noscript></noscript>';
+      }
+      
+      $output .= '</figure>';
+      $output .= '</div>';
+      $output .= '<div class="p-postList__body">';
+      $output .= '<h2 class="p-postList__title">' . esc_html($title) . '</h2>';
+      $output .= '<div class="p-postList__meta"></div>';
+      $output .= '</div>';
+      $output .= '</a>';
+      $output .= '</li>';
+    }
+  }
+  
+  $output .= '</ul></div>';
+  
+  return $output;
+});
