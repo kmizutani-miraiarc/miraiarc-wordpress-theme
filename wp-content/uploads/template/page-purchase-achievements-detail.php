@@ -62,7 +62,7 @@ if ($achievement_id > 0) {
   <main id="main" class="l-content">
     <?php if ( $achievement ) : ?>
 
-      <article class="p-entry">
+      <article <?php post_class('p-entry'); ?>>
 
         <!-- タイトル -->
         <header class="p-entry__header c-section">
