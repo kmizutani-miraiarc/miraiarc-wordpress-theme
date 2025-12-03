@@ -79,59 +79,97 @@ if (!is_wp_error($response)) {
 $noimg = get_stylesheet_directory_uri() . '/assets/img/noimg.png';
 ?>
 <style>
-.tx-archive{--gap:32px;--radius:10px}
-.tx-archive .grid{display:grid;gap:var(--gap);grid-template-columns:repeat(2,minmax(0,1fr))}
-@media (max-width:781px){.tx-archive .grid{grid-template-columns:1fr}}
-.tx-card{background:#fff;overflow:hidden}
-.tx-thumb{position:relative;display:block;overflow:hidden}
-.tx-thumb::before{content:"";display:block;aspect-ratio:16/10}
-.tx-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.tx-body{padding:14px 16px 16px}
-.tx-title{margin:0 0 6px;font-weight:700;font-size:1.06rem;line-height:1.6}
-.tx-cats{color:#6b7280;font-size:.86rem;margin-bottom:8px}
+/* ====== このテンプレにだけ効く軽量スタイル ====== */
+.ex-archive{--gap:32px;--radius:10px}
+.ex-archive .grid{
+  display:grid;gap:var(--gap);
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+@media (max-width: 781px){
+  .ex-archive .grid{grid-template-columns:1fr}
+}
+
+.ex-card__thumb{display:block;position:relative;overflow:hidden}
+.ex-card__thumb::before{
+  content:"";display:block;aspect-ratio:16/10; /* 画像比率（必要なら調整） */
+}
+.ex-card__thumb img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+}
+.ex-card__body{padding:14px 16px 16px}
+.ex-card__cats{color:#6b7280;font-size:.86rem;margin-bottom:8px}
+.ex-card__title{
+  font-size:1.06rem;line-height:1.55;margin:0 0 6px;font-weight:700;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden
+}
+.ex-card__excerpt{color:#555;font-size:.95rem;margin:8px 0 0}
+.ex-archive__head{margin:10px 0 28px;text-align:center}
+.ex-archive__title{font-size:clamp(24px,3.2vw,40px);letter-spacing:.05em;margin:0 0 6px}
+.ex-archive__desc{color:#666}
 </style>
 
-<div class="l-container tx-archive">
+<div class="l-container ex-archive">
   <main id="main" class="l-content">
 
-    <header class="c-section" style="text-align:center;margin:10px 0 28px;">
-      <h1 class="p-archive__title"><?php echo esc_html($prefecture_display ?: '買取実績'); ?></h1>
+    <!-- ヘッダー -->
+    <header class="ex-archive__head c-section">
+      <h1 class="ex-archive__title"><?php echo esc_html($prefecture_display ?: 'EXAMPLE'); ?></h1>
       <?php if ($prefecture_display) : ?>
-        <div class="p-archive__desc"></div>
+        <p class="ex-archive__desc">買取実績</p>
       <?php endif; ?>
     </header>
 
     <?php if ( !empty($achievements) ) : ?>
       <div class="grid">
+
         <?php foreach ( $achievements as $achievement ) : 
           $title = esc_html($achievement['title'] ?? '');
           $property_name = esc_html($achievement['property_name'] ?? '');
           $prefecture = esc_html($achievement['prefecture'] ?? '');
+          $city = esc_html($achievement['city'] ?? '');
           $image_url = esc_url($achievement['property_image_url'] ?? '');
           $detail_url = add_query_arg('id', intval($achievement['id']), home_url('/purchase-achievements-detail/'));
           $summary = esc_html($achievement['title'] ?? '');
         ?>
-          <article class="tx-card">
-            <a href="<?php echo $detail_url; ?>" class="tx-thumb">
+          <article class="ex-card">
+
+            <!-- サムネイル -->
+            <a class="ex-card__thumb" href="<?php echo $detail_url; ?>">
               <?php if ( $image_url ) : ?>
                 <img src="<?php echo $image_url; ?>" alt="<?php echo esc_attr($title); ?>">
               <?php else : ?>
-                <img src="<?php echo esc_url($noimg); ?>" alt="">
+                <img src="<?php echo esc_url( $noimg ); ?>" alt="">
               <?php endif; ?>
             </a>
-            <div class="tx-body">
-              <div class="tx-cats">
-                <?php if ( $prefecture ) : ?>
-                  <a href="<?php echo esc_url(add_query_arg('prefecture', $prefecture, home_url('/purchase-achievements/'))); ?>"><?php echo $prefecture; ?></a>
+
+            <div class="ex-card__body">
+              <!-- カテゴリ（都道府県）と買取日 -->
+              <div class="ex-card__cats" style="display:flex;justify-content:space-between;align-items:center;">
+                <span>
+                  <?php if ( $prefecture ) : ?>
+                    <a href="<?php echo esc_url(add_query_arg('prefecture', $prefecture, home_url('/purchase-achievements/'))); ?>"><?php echo $prefecture; ?></a>
+                  <?php else : ?>
+                    物件カテゴリ
+                  <?php endif; ?>
+                </span>
+                <?php if ( !empty($achievement['purchase_date']) ) : ?>
+                  <span style="text-align:right;font-size:.86rem;color:#6b7280;">
+                    <?php echo esc_html($achievement['purchase_date']); ?>
+                  </span>
                 <?php endif; ?>
               </div>
-              <h2 class="tx-title"><a href="<?php echo $detail_url; ?>"><?php echo $title ?: $property_name; ?></a></h2>
-              <div class="p-card__excerpt">
-                <?php echo esc_html( wp_trim_words( $summary, 36, '…' ) ); ?>
+
+              <!-- タイトル -->
+              <h2 class="ex-card__title"><a href="<?php echo $detail_url; ?>"><?php echo $title ?: $property_name; ?></a></h2>
+
+              <!-- 説明 -->
+              <div class="ex-card__excerpt" style="display:none;">
+                <?php echo wp_trim_words( $summary, 36, '…' ); ?>
               </div>
             </div>
           </article>
         <?php endforeach; ?>
+
       </div>
 
       <!-- ページネーション -->
@@ -156,7 +194,7 @@ $noimg = get_stylesheet_directory_uri() . '/assets/img/noimg.png';
         </div>
       <?php endif; ?>
     <?php else : ?>
-      <p>このエリアにはまだ買取実績がありません。</p>
+      <p>まだ事例がありません。</p>
     <?php endif; ?>
   </main>
 </div>
