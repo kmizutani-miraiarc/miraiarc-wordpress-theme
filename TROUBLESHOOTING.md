@@ -127,3 +127,4 @@ curl -I http://localhost:8081/exemple/your-post-slug/
 - パーマリンク設定を変更すると、WordPressが自動的に`.htaccess`を更新します
 - カスタム投稿タイプの場合は、テーマやプラグインで`register_post_type`の`rewrite`パラメータが正しく設定されている必要があります
 
+

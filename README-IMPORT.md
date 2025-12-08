@@ -101,3 +101,4 @@ docker exec -i mirai-wordpress-db mysql -uwordpress_user -pwordpress_password -e
 - 本番環境のデータを上書きしないよう注意してください
 - ローカル環境でのみ使用してください
 
+
