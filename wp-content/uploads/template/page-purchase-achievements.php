@@ -108,6 +108,12 @@ $noimg = get_stylesheet_directory_uri() . '/assets/img/noimg.png';
 .ex-archive__head{margin:10px 0 28px;text-align:center}
 .ex-archive__title{font-size:clamp(24px,3.2vw,40px);letter-spacing:.05em;margin:0 0 6px}
 .ex-archive__desc{color:#666}
+/* 買取実績ページでのみ.l-contentのpadding-topを無効化 */
+@media (min-width: 600px) {
+  .ex-archive .l-content {
+    padding-top: 0;
+  }
+}
 </style>
 
 <div class="l-container ex-archive">

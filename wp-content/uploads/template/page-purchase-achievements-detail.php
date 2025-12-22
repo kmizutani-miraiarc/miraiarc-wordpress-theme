@@ -22,6 +22,12 @@ get_header();
   width: 100%;
   box-sizing: border-box;
 }
+/* 買取実績詳細ページでのみ.l-contentのpadding-topを無効化 */
+@media (min-width: 600px) {
+  .ex-single .l-content {
+    padding-top: 0;
+  }
+}
 </style>
 <?php
 
