@@ -119,6 +119,21 @@ $noimg = get_stylesheet_directory_uri() . '/assets/img/noimg.png';
       <?php endif; ?>
     </header>
 
+        <!-- 物件カテゴリー -->
+    <div class="widget">
+      <h2 class="widget__title">エリアカテゴリー</h2>
+      <ul>
+        <li><a href="<?php echo esc_url(home_url('/purchase-achievements/')); ?>">すべて</a></li>
+        <li><a href="<?php echo esc_url(add_query_arg('prefecture', '千葉県', home_url('/purchase-achievements/'))); ?>">千葉県</a></li>
+        <li><a href="<?php echo esc_url(add_query_arg('prefecture', '埼玉県', home_url('/purchase-achievements/'))); ?>">埼玉県</a></li>
+        <li><a href="<?php echo esc_url(add_query_arg('prefecture', '栃木県', home_url('/purchase-achievements/'))); ?>">栃木県</a></li>
+        <li><a href="<?php echo esc_url(add_query_arg('prefecture', '神奈川県', home_url('/purchase-achievements/'))); ?>">神奈川県</a></li>
+        <li><a href="<?php echo esc_url(add_query_arg('prefecture', '群馬県', home_url('/purchase-achievements/'))); ?>">群馬県</a></li>
+        <li><a href="<?php echo esc_url(add_query_arg('prefecture', '茨城県', home_url('/purchase-achievements/'))); ?>">茨城県</a></li>
+        <li><a href="<?php echo esc_url(add_query_arg('prefecture', '東京都', home_url('/purchase-achievements/'))); ?>">都内エリア</a></li>
+      </ul>
+    </div>
+
     <?php if ( !empty($achievements) ) : ?>
       <div class="grid">
 

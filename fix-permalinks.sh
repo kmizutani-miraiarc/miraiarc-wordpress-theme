@@ -85,3 +85,6 @@ echo ""
 echo -e "${YELLOW}注意: これにより.htaccessファイルが自動的に更新されます${NC}"
 
 
+
+
+

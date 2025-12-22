@@ -128,3 +128,6 @@ curl -I http://localhost:8081/exemple/your-post-slug/
 - カスタム投稿タイプの場合は、テーマやプラグインで`register_post_type`の`rewrite`パラメータが正しく設定されている必要があります
 
 
+
+
+
