@@ -138,7 +138,6 @@ if ($api_url && $api_key) {
         <?php
         // 指定された項目を常に表示（データがない場合もタイトルだけ表示）
         $rows = [
-            ['label' => '物件名', 'value' => $achievement['property_name'] ?? ''],
             ['label' => '築年数', 'value' => !empty($achievement['building_age']) ? $achievement['building_age'] . '年' : ''],
             ['label' => '構造', 'value' => $achievement['structure'] ?? ''],
             ['label' => '最寄り', 'value' => $achievement['nearest_station'] ?? ''],
